@@ -11,15 +11,6 @@
 #include <X11/Xos.h>
 #include "sprite.h"
 
-int width, height;
-int x, y;
-png_byte color_type;
-png_byte bit_depth;
-
-png_structp png_ptr;
-png_infop info_ptr;
-int number_of_passes;
-png_bytep * row_pointers;
 
 void abort_(const char * s, ...)
 {
@@ -44,7 +35,16 @@ void drawSprite(struct pixelSprite sprite, Display *dpy, Drawable drawable, GC g
 }
 
 
-void readPng(char* file_name){
+png_bytep* readPng(char* file_name, int *width, int * height){
+    png_bytep * row_pointers;
+    int x, y;
+
+    png_byte color_type;
+    png_byte bit_depth;
+
+    png_structp png_ptr;
+    png_infop info_ptr;
+    int number_of_passes;
 
     char header[8];    // 8 is the maximum size that can be checked
 
@@ -75,8 +75,11 @@ void readPng(char* file_name){
 
     png_read_info(png_ptr, info_ptr);
 
-    width = png_get_image_width(png_ptr, info_ptr);
-    height = png_get_image_height(png_ptr, info_ptr);
+    *width = png_get_image_width(png_ptr, info_ptr);
+    *height = png_get_image_height(png_ptr, info_ptr);
+
+    int widthVal = *width;
+    int heightVal = *height;
 
     color_type = png_get_color_type(png_ptr, info_ptr);
     bit_depth = png_get_bit_depth(png_ptr, info_ptr);
@@ -88,38 +91,37 @@ void readPng(char* file_name){
     if (setjmp(png_jmpbuf(png_ptr)))
 	    abort_("[read_png_file] Error during read_image");
 
-    row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * (height));
-    for (y=0; y<height; y++)
+    row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * (widthVal));
+
+    for (y=0; y<heightVal; y++)
 	    row_pointers[y] = (png_byte*) malloc(png_get_rowbytes(png_ptr,info_ptr));
 
     png_read_image(png_ptr, row_pointers);
-
     fclose(fp);
 
-    // remove struct
+    return row_pointers;
 }
 
-struct pixelSprite processFile(){
+struct pixelSprite processFile(png_bytep * row_pointers, int width, int height){
     struct pixelSprite sprite;
     sprite.columns = width;
-
-    for (y=0; y<height; y++) {
+    
+    for (int y=0; y<height; y++) {
         png_byte* row = row_pointers[y];
-        for (x=0; x<width; x++) {
+        for (int x=0; x<(width); x++) {
             png_byte* ptr = &(row[x*4]);
-            short index = y*width + x; 
+            short index = y*(width) + x; 
             sprite.pixels[index] = RGB(ptr[0], ptr[1], ptr[2]);
         }
     }
-    printf("%d\n", sprite.columns);
     return sprite;
 }
 
 struct pixelSprite readSprite(char * path){
-    //printf("\nPRINT MOTHERFUCKER");
-    readPng(path);
-    struct pixelSprite sprite = processFile();
-    printf("%d\n", sprite.columns);
+    int width, height;
+    png_bytep * row_pointers = readPng(path, &width, &height);
+
+    struct pixelSprite sprite = processFile(row_pointers, width, height);
     return sprite;
 }
 
