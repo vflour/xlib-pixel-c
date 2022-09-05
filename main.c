@@ -1,57 +1,104 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <X11/Xlib.h>
+#include <string.h>
 
-void createWindow(){
-    Display *dpy;
-    int screen;
-    Window win;
-    XEvent event;
-    GC gc;
-    
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+#include "sprite.h"
+
+Display *dpy;
+int screen;
+Window win;
+Window childWin;
+XEvent event;
+GC gc;
+long black;
+long white;
+
+void initWindow();
+void closeWindow();
+void drawWindow();
+
+void testSprite(){
+    struct pixelSprite sprite = {
+        .pixels = {(0)},
+        .columns = 3
+    };
+    drawSprite(sprite, dpy, win, gc);
+}
+
+void initWindow(){
 	dpy = XOpenDisplay((char *)0);
    	screen = DefaultScreen(dpy);
-	long black = BlackPixel(dpy,screen);	/* get color black */
-	long white = WhitePixel(dpy, screen);  /* get color white */
 
-    win = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, 200, 300, 5, black, white);
+    black = BlackPixel(dpy, screen);	/* get color black */
+    white = WhitePixel(dpy, screen);  /* get color white */
 
-	/* this routine determines which types of input are allowed in
-	   the input.  see the appropriate section for details...
-	*/
-	XSelectInput(dpy, win, ExposureMask|ButtonPressMask|KeyPressMask);
+    win = XCreateSimpleWindow(dpy, RootWindow(dpy, screen), 0, 0, 500, 500, 1, black, white);
+    XSetStandardProperties(dpy, win, "PixelController", "", None, NULL, 0, NULL);
+    XSelectInput(dpy, win, ExposureMask | ButtonPressMask | KeyPressMask);
+    gc = XCreateGC(dpy, win, 0, 0);
+    XSetBackground(dpy, gc, white);
+    XSetForeground(dpy, gc, black);
 
-	/* create the Graphics Context */
-    gc=XCreateGC(dpy, win, 0,0);        
+    childWin = XCreateSimpleWindow(dpy, win, 20, 20, 200, 100, 1, black, white);
 
-	/* here is another routine to set the foreground and background
-	   colors _currently_ in use in the window.
-	*/
-	XSetBackground(dpy,gc,white);
-	XSetForeground(dpy,gc,black);
-
-	/* clear the window and bring it on top of the other windows */
-	XClearWindow(dpy, win);
-	XMapRaised(dpy, win);
-
+    XClearWindow(dpy, win);
     XMapRaised(dpy, win);
-    XFlush(dpy);
+
+}
+
+void closeWindow(){
+    XFreeGC(dpy, gc);
+    XDestroyWindow(dpy, win);
+    XCloseDisplay(dpy);
+    printf("Goodbye \n");
+    exit(0);
+}
+
+void drawWindow(){
+    XClearWindow(dpy, win);
+}
+
+void eventLoop(){
+    char text[255];
+    KeySym key;
+
+    struct pixelSprite spriteRef = readSprite("sprites/01_dish.png");
+    printf("%d\n", spriteRef.columns);
+    drawSprite(spriteRef, dpy, win, gc);
+
     while(1){
         XNextEvent(dpy, &event);
+        if(event.type == Expose && event.xexpose.count == 0){
+            drawWindow();
+            drawSprite(spriteRef, dpy, win, gc);
+        }
+        if(event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0)==1){
+            if(text[0] == 'q') {
+                closeWindow();
+            }
+        }
+        if (event.type == ButtonPress){
+            int x = event.xbutton.x; int y = event.xbutton.y;
+            char buffer[128];
+            snprintf(buffer, sizeof(buffer), "%d, %d", x, y);
+            XDrawString(dpy, win, gc, x, y, buffer, strlen(buffer));
+
+        }
     }
 }
 
-bool isBelowSize(char *input){
+// Returns true if the string length is below ten characters
+bool isBelowSize(char input[]){
     int maxSize = 10;
-    int size = 0;
-
-    for(int i = 0; i<size; i++){
-        size++;
-    }
+    int size = (int)(strlen(input));
     return size <= maxSize;
 }
 
+/// Prompt user through terminal to enter their name
 void askForName(){
     unsigned char maxStringSize = 255;
     char userInput[maxStringSize];
@@ -67,9 +114,10 @@ void askForName(){
     }
 }
 
+// Main program
 int main(){
-    askForName();
-    createWindow();
-    printf("Goodbye \n");
+    //askForName();
+    initWindow();
+    eventLoop();
     return 0;
 }

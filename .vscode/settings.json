@@ -1,7 +1,11 @@
 {
   "files.associations": {
     "*.blua": "lua",
-    "main.C": "cpp"
+    "main.C": "cpp",
+    "stdbool.h": "c",
+    "string_view": "c",
+    "chrono": "cpp",
+    "variant": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
@@ -20,7 +24,8 @@
   "C_Cpp_Runner.compilerArgs": [
     "-I /usr/include/X11",
     "-L /usr/X11/lib",
-    "-lX11"
+    "-lX11",
+    "-lpng"
   ],
   "C_Cpp_Runner.linkerArgs": [],
   "C_Cpp_Runner.includePaths": [],
