@@ -5,7 +5,9 @@
     "stdbool.h": "c",
     "string_view": "c",
     "chrono": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "vector.h": "c",
+    "xutil.h": "c"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

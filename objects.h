@@ -4,13 +4,16 @@
 #include <string.h>
 
 #include "sprite.h"
+#include "vector.h"
 
 typedef struct{
     PixelSprite* sprite;
-    int x, y;
-    int vx, vy;
+    Vector2 pos;
+    Vector2 velocity;
 }Object;
 
 void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc);
 Object* getObjects();
 void getSpritesToRender();
+void freeObjects(Object* objects);
+void stepObjects(Object* objects);

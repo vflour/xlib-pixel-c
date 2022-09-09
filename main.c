@@ -2,12 +2,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 #include "sprite.h"
 #include "objects.h"
+#include <pthread.h>
 
 Display *dpy;
 int screen;
@@ -17,6 +19,7 @@ XEvent event;
 GC gc;
 long black;
 long white;
+Object* objects;
 
 void initWindow();
 void closeWindow();
@@ -47,6 +50,8 @@ void closeWindow(){
     XFreeGC(dpy, gc);
     XDestroyWindow(dpy, win);
     XCloseDisplay(dpy);
+    freeObjects(objects);
+
     printf("Goodbye \n");
     exit(0);
 }
@@ -55,34 +60,38 @@ void drawWindow(){
     XClearWindow(dpy, win);
 }
 
+void physicsLoop(){
+    stepObjects(objects);
+    drawObjects(objects, dpy, win, gc);
+}
+
 void eventLoop(){
     char text[255];
     KeySym key;
-
-    getSpritesToRender();
-    Object* objects = getObjects();
     
     while(1){
-        XNextEvent(dpy, &event);
+        usleep(100000);
+        XCheckWindowEvent(dpy, win, ExposureMask | KeyPressMask, &event);
+
         if(event.type == Expose && event.xexpose.count == 0){
             drawWindow();
+            physicsLoop();
             drawObjects(objects, dpy, win, gc);
-            //drawSprite(spriteRef, dpy, win, gc);
         }
         if(event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0)==1){
             if(text[0] == 'q') {
                 closeWindow();
             }
         }
-        if (event.type == ButtonPress){
-            int x = event.xbutton.x; int y = event.xbutton.y;
-            char buffer[128];
-            snprintf(buffer, sizeof(buffer), "%d, %d", x, y);
-            XDrawString(dpy, win, gc, x, y, buffer, strlen(buffer));
-
-        }
     }
 }
+
+void threadLoop(){
+    getSpritesToRender();
+    objects = getObjects();
+    eventLoop();
+}
+
 
 // Returns true if the string length is below ten characters
 bool isBelowSize(char input[]){
@@ -111,6 +120,6 @@ void askForName(){
 int main(){
     //askForName();
     initWindow();
-    eventLoop();
+    threadLoop();
     return 0;
 }
