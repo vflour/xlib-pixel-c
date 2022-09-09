@@ -8,13 +8,13 @@
 
 #define MAX_SPRITE_SIZE (unsigned short)65535
 
-struct pixelSprite {
+typedef struct {
     long pixels[MAX_SPRITE_SIZE];
     int columns;
-};
+}PixelSprite;
 
-struct pixelSprite readSprite(char path[]);
-void drawSprite(struct pixelSprite sprite, Display *dpy, Drawable drawable, GC gc);
+PixelSprite readSprite(char path[]);
+void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc);
 unsigned long RGB(int r, int g, int b);
 
 #endif

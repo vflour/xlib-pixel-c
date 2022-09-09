@@ -7,6 +7,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 #include "sprite.h"
+#include "objects.h"
 
 Display *dpy;
 int screen;
@@ -20,14 +21,6 @@ long white;
 void initWindow();
 void closeWindow();
 void drawWindow();
-
-void testSprite(){
-    struct pixelSprite sprite = {
-        .pixels = {(0)},
-        .columns = 3
-    };
-    drawSprite(sprite, dpy, win, gc);
-}
 
 void initWindow(){
 	dpy = XOpenDisplay((char *)0);
@@ -66,15 +59,15 @@ void eventLoop(){
     char text[255];
     KeySym key;
 
-    struct pixelSprite spriteRef = readSprite("sprites/01_dish.png");
-    printf("%d\n", spriteRef.columns);
-    drawSprite(spriteRef, dpy, win, gc);
-
+    getSpritesToRender();
+    Object* objects = getObjects();
+    
     while(1){
         XNextEvent(dpy, &event);
         if(event.type == Expose && event.xexpose.count == 0){
             drawWindow();
-            drawSprite(spriteRef, dpy, win, gc);
+            drawObjects(objects, dpy, win, gc);
+            //drawSprite(spriteRef, dpy, win, gc);
         }
         if(event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0)==1){
             if(text[0] == 'q') {

@@ -11,6 +11,14 @@
 #include <X11/Xos.h>
 #include "sprite.h"
 
+/// @brief Converts RGB values into an unsigned long val
+/// @param r
+/// @param g 
+/// @param b 
+/// @return long value color
+unsigned long RGB(int r, int g, int b){
+    return b + (g<<8) + (r<<16);
+}
 
 void abort_(const char * s, ...)
 {
@@ -22,19 +30,28 @@ void abort_(const char * s, ...)
 	abort();
 }
 
-void drawSprite(struct pixelSprite sprite, Display *dpy, Drawable drawable, GC gc){
+/// @brief Draws the sprite onto a drawable
+/// @param sprite 
+/// @param dpy 
+/// @param drawable 
+/// @param gc 
+void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc){
     for (unsigned short i = 0; i < MAX_SPRITE_SIZE; i++){
-        short x = i%sprite.columns+20;
-        short y = i/sprite.columns+20;
+        short x = i%sprite->columns+offsetX;
+        short y = i/sprite->columns+offsetY;
 
-        if(sprite.pixels[i]!=0){
-            XSetForeground(dpy, gc, sprite.pixels[i]);
+        if(sprite->pixels[i]!=0){
+            XSetForeground(dpy, gc, sprite->pixels[i]);
             XDrawPoint(dpy, drawable, gc, x, y);
         }
     }
 }
 
-
+/// @brief Reads a png file from a path.
+/// @param file_name 
+/// @param width 
+/// @param height 
+/// @return Pixel buffer for the reader
 png_bytep* readPng(char* file_name, int *width, int * height){
     png_bytep * row_pointers;
     int x, y;
@@ -102,13 +119,15 @@ png_bytep* readPng(char* file_name, int *width, int * height){
     return row_pointers;
 }
 
-struct pixelSprite processFile(png_bytep * row_pointers, int width, int height){
-    struct pixelSprite sprite;
+/// Converts the pixel buffer into a sprite
+PixelSprite processFile(png_bytep * row_pointers, int width, int height){
+    PixelSprite sprite;
     sprite.columns = width;
-    
-    for (int y=0; y<height; y++) {
+
+    /// Go through each row
+    for (int y=0; y< height; y++) {
         png_byte* row = row_pointers[y];
-        for (int x=0; x<(width); x++) {
+        for (int x=0; x< width; x++) {
             png_byte* ptr = &(row[x*4]);
             short index = y*(width) + x; 
             sprite.pixels[index] = RGB(ptr[0], ptr[1], ptr[2]);
@@ -117,14 +136,11 @@ struct pixelSprite processFile(png_bytep * row_pointers, int width, int height){
     return sprite;
 }
 
-struct pixelSprite readSprite(char * path){
+/// @brief Get the path of a sprite and draw it
+PixelSprite readSprite(char * path){
     int width, height;
     png_bytep * row_pointers = readPng(path, &width, &height);
 
-    struct pixelSprite sprite = processFile(row_pointers, width, height);
+    PixelSprite sprite = processFile(row_pointers, width, height);
     return sprite;
-}
-
-unsigned long RGB(int r, int g, int b){
-    return b + (g<<8) + (r<<16);
 }
