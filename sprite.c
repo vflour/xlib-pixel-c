@@ -47,6 +47,18 @@ void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy,
     }
 }
 
+void clearSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background){
+    XSetForeground(dpy, gc, background);
+    for (unsigned short i = 0; i < MAX_SPRITE_SIZE; i++){
+        short x = i%sprite->columns+offsetX;
+        short y = i/sprite->columns+offsetY;
+
+        if(sprite->pixels[i]!=0){
+            XDrawPoint(dpy, drawable, gc, x, y);
+        }
+    }
+}
+
 /// @brief Reads a png file from a path.
 /// @param file_name 
 /// @param width 

@@ -12,8 +12,7 @@ typedef struct{
     Vector2 velocity;
 }Object;
 
-void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc);
+void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long bg);
 Object* getObjects();
 void getSpritesToRender();
 void freeObjects(Object* objects);
-void stepObjects(Object* objects);

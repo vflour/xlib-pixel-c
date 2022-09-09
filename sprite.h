@@ -14,6 +14,8 @@ typedef struct {
 }PixelSprite;
 
 PixelSprite readSprite(char path[]);
+
+void clearSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background);
 void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc);
 unsigned long RGB(int r, int g, int b);
 

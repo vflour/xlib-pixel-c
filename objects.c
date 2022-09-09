@@ -29,7 +29,7 @@ Object* getObjects(){
             .y = 100,
         },
         .velocity = {
-            .x = 0,
+            .x = 1,
             .y = 0,
         },
         
@@ -58,17 +58,16 @@ void stepVelocity(Object* o){
     o->pos.y = o->pos.y + o->velocity.y;
 }
 
-void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc){
-    XClearWindow(dpy, drawable);
+void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long bg){
+    usleep(10000);
     for(int i = 0; i < 2; i++){
-        drawSprite(objects[i].sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc);
-    }
-}
-
-void stepObjects(Object* objects){
-    for(int i = 0; i < 2; i++){
+        clearSprite(objects[i].sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc, bg);
         stepVelocity(&objects[i]);
     }
+    for(int i=0; i<2; i++){
+        drawSprite(objects[i].sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc);
+    }
+    XFlush(dpy);
 }
 
 void freeObjects(Object* objects){

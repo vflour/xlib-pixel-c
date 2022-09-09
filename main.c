@@ -56,27 +56,28 @@ void closeWindow(){
     exit(0);
 }
 
-void drawWindow(){
-    XClearWindow(dpy, win);
+void physicsLoop(){
+    drawObjects(objects, dpy, win, gc, white);
 }
 
-void physicsLoop(){
-    stepObjects(objects);
-    drawObjects(objects, dpy, win, gc);
+void drawWindow(){
+    //XClearWindow(dpy, win);
+    drawObjects(objects, dpy, win, gc, white);
+    
 }
 
 void eventLoop(){
     char text[255];
     KeySym key;
-    
-    while(1){
-        usleep(100000);
-        XCheckWindowEvent(dpy, win, ExposureMask | KeyPressMask, &event);
+    XClearWindow(dpy, win);
 
+    while(1){
+        XCheckWindowEvent(dpy, win, ExposureMask | KeyPressMask, &event);
+        //XNextEvent(dpy, &event);
+        
         if(event.type == Expose && event.xexpose.count == 0){
             drawWindow();
-            physicsLoop();
-            drawObjects(objects, dpy, win, gc);
+
         }
         if(event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0)==1){
             if(text[0] == 'q') {
@@ -91,7 +92,6 @@ void threadLoop(){
     objects = getObjects();
     eventLoop();
 }
-
 
 // Returns true if the string length is below ten characters
 bool isBelowSize(char input[]){
