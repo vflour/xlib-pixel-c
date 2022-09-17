@@ -1,0 +1,59 @@
+{ "frames": {
+   "B_witch #Idle 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   },
+   "B_witch #Idle 1.aseprite": {
+    "frame": { "x": 0, "y": 16, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   },
+   "B_witch #Idle 2.aseprite": {
+    "frame": { "x": 0, "y": 32, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   },
+   "B_witch #Idle 3.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   },
+   "B_witch #Idle 4.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   },
+   "B_witch #Idle 5.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 16, "y": 32, "w": 16, "h": 16 },
+    "sourceSize": { "w": 111, "h": 48 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.40-dev",
+  "image": "B_witch.png",
+  "format": "RGBA8888",
+  "size": { "w": 16, "h": 48 },
+  "scale": "1"
+ }
+}
