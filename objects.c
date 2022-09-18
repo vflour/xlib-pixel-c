@@ -29,11 +29,11 @@ Object* getObjects(){
             .y = 100,
         },
         .velocity = {
-            .x = 1,
+            .x = 0,
             .y = 0,
         },
         .step = 0,
-        .state = 1,
+        .state = 0,
         
     };
     objects[0] = o1;
@@ -49,7 +49,7 @@ Object* getObjects(){
             .y = 0,
         },
         .step = 0,
-        .state = 2,
+        .state = 0,
         
     };
     objects[1] = o2;

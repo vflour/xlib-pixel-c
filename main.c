@@ -34,7 +34,7 @@ void initWindow(){
 
     win = XCreateSimpleWindow(dpy, RootWindow(dpy, screen), 0, 0, 500, 500, 1, black, white);
     XSetStandardProperties(dpy, win, "PixelController", "", None, NULL, 0, NULL);
-    XSelectInput(dpy, win, ExposureMask | ButtonPressMask | KeyPressMask);
+    XSelectInput(dpy, win, ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);
     gc = XCreateGC(dpy, win, 0, 0);
     XSetBackground(dpy, gc, white);
     XSetForeground(dpy, gc, black);
@@ -72,17 +72,41 @@ void eventLoop(){
     XClearWindow(dpy, win);
 
     while(1){
-        XCheckWindowEvent(dpy, win, ExposureMask | KeyPressMask, &event);
+        XCheckWindowEvent(dpy, win, ExposureMask | KeyReleaseMask | KeyPressMask , &event);
         //XNextEvent(dpy, &event);
-        
-        if(event.type == Expose && event.xexpose.count == 0){
-            drawWindow();
-
-        }
-        if(event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0)==1){
-            if(text[0] == 'q') {
-                closeWindow();
+        drawWindow();
+        if(event.type == KeyPress){
+            if( XLookupString(&event.xkey, text, 255, &key, 0)==1){
+                if(text[0] == 'q') {
+                    closeWindow();
+                }
             }
+            if(event.xkey.keycode == 113){
+                objects[0].velocity.x = -5;
+            }
+            if(event.xkey.keycode == 114){
+                objects[0].velocity.x = 5;
+            }
+            if(event.xkey.keycode == 116){
+                objects[0].velocity.y = 5;
+            }
+            if(event.xkey.keycode == 111){
+                objects[0].velocity.y = -5;
+            }
+        }
+        else if(event.type == KeyRelease){
+            if(event.xkey.keycode == 113){
+                objects[0].velocity.x = 0;
+            }
+            if(event.xkey.keycode == 114){
+                objects[0].velocity.x = 0;
+            }
+            if(event.xkey.keycode == 116){
+                objects[0].velocity.y = 0;
+            }
+            if(event.xkey.keycode == 111){
+                objects[0].velocity.y = 0;
+            }            
         }
     }
 }
