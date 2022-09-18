@@ -3,6 +3,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include "cute_aseprite.h"
 #include <X11/Xos.h>
 #include "png.h"
 
@@ -13,7 +14,17 @@ typedef struct {
     int columns;
 }PixelSprite;
 
-PixelSprite readSprite(char path[]);
+/// @brief Group the sprites into animatable ones
+typedef struct {
+    PixelSprite* sprites;
+    /// Store each anim group sequentially, based on the length of each one
+    char* groups;
+    char groupCount;
+}SpriteGroup;
+
+PixelSprite readSprite(char* path);
+SpriteGroup readSpriteGroup(char * path);
+
 
 void clearSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background);
 void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc);

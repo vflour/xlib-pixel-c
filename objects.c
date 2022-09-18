@@ -7,12 +7,12 @@
 #include "sprite.h"
 #include "objects.h"
 
-PixelSprite* sprites;
+SpriteGroup* sprites;
 
 void getSpritesToRender(){
     int numSprites = 1;
-    sprites = malloc(numSprites*sizeof(PixelSprite));  
-    sprites[0] = readSprite("sprites/01_dish.png");
+    sprites = malloc(numSprites*sizeof(SpriteGroup));  
+    sprites[0] = readSpriteGroup("sprites/Blue_witch/B_witch_transparent.ase");
 
     return sprites;
 }
@@ -32,6 +32,8 @@ Object* getObjects(){
             .x = 1,
             .y = 0,
         },
+        .step = 0,
+        .state = 1,
         
     };
     objects[0] = o1;
@@ -43,9 +45,11 @@ Object* getObjects(){
             .y = 50,
         },
         .velocity = {
-            .x = 1,
+            .x = 0,
             .y = 0,
         },
+        .step = 0,
+        .state = 2,
         
     };
     objects[1] = o2;
@@ -58,14 +62,39 @@ void stepVelocity(Object* o){
     o->pos.y = o->pos.y + o->velocity.y;
 }
 
+char getSpriteIndex(SpriteGroup * spriteGroup, char step, char state){
+    // calculate the amount of frames from the previous groups
+    int index = 0;
+    for(char i = 0; i < state; i++){
+        index = index + spriteGroup->groups[i];
+    }
+    // get the frame index
+    return index+step;
+}
+
+int positive_modulo(int i, int n) {
+    return (i % n + n) % n;
+}
+
 void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long bg){
-    usleep(10000);
+    usleep(50000);
     for(int i = 0; i < 2; i++){
-        clearSprite(objects[i].sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc, bg);
+        SpriteGroup* spriteGroup = objects[i].sprite;
+        char prevStep = positive_modulo(objects[i].step - 1, spriteGroup->groups[objects[i].state]);
+        char index = getSpriteIndex(spriteGroup, prevStep, objects[i].state);
+        PixelSprite* sprite = &spriteGroup->sprites[index];
+
+        clearSprite(sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc, bg);
         stepVelocity(&objects[i]);
     }
+    usleep(1000);
     for(int i=0; i<2; i++){
-        drawSprite(objects[i].sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc);
+        SpriteGroup* spriteGroup = objects[i].sprite;
+        PixelSprite* sprite = &spriteGroup->sprites[getSpriteIndex(spriteGroup, objects[i].step, objects[i].state)];
+
+        drawSprite(sprite, objects[i].pos.x, objects[i].pos.y, dpy, drawable, gc);
+        // add to state
+        objects[i].step = (objects[i].step + 1) % (spriteGroup->groups[objects[i].state]);
     }
     XFlush(dpy);
 }

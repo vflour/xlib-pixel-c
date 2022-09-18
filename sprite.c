@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include "cute_aseprite.h"
 #include "png.h"
 
 #define PNG_DEBUG 3
@@ -49,6 +50,7 @@ void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy,
 
 void clearSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background){
     XSetForeground(dpy, gc, background);
+
     for (unsigned short i = 0; i < MAX_SPRITE_SIZE; i++){
         short x = i%sprite->columns+offsetX;
         short y = i/sprite->columns+offsetY;
@@ -128,6 +130,8 @@ png_bytep* readPng(char* file_name, int *width, int * height){
     png_read_image(png_ptr, row_pointers);
     fclose(fp);
 
+    free(png_ptr);
+    free(info_ptr);
     return row_pointers;
 }
 
@@ -145,6 +149,7 @@ PixelSprite processFile(png_bytep * row_pointers, int width, int height){
             sprite.pixels[index] = RGB(ptr[0], ptr[1], ptr[2]);
         }
     }
+    free(row_pointers);
     return sprite;
 }
 
@@ -155,4 +160,39 @@ PixelSprite readSprite(char * path){
 
     PixelSprite sprite = processFile(row_pointers, width, height);
     return sprite;
+}
+
+SpriteGroup readSpriteGroup(char * path){
+    ase_t* ase = cute_aseprite_load_from_file(path, NULL);
+    int w = ase->w;
+    int h = ase->h;
+    int l = w*h;
+
+    PixelSprite* sprites = malloc((ase->frame_count)*sizeof(PixelSprite));
+    for (int i = 0; i < ase->frame_count; ++i) {
+        ase_frame_t* frame = ase->frames + i;
+        sprites[i].columns = w;
+        for(int x = 0; x<l; ++x){
+            ase_color_t  color = frame->pixels[x];
+            long pix = RGB(color.r, color.g, color.b);
+            //printf("%d \n", pix);
+            
+            sprites[i].pixels[x] = pix;
+        }
+    }
+    // get the groups for each tag in the sprite
+    char* groups = malloc(sizeof(char)*1);
+    for (int i = 0; i < ase->tag_count; ++i){
+        ase_tag_t * tag = ase->tags + i;
+        groups[i] = tag->to_frame-tag->from_frame;
+    }
+
+    cute_aseprite_free(ase);
+    SpriteGroup group = {
+        .sprites = sprites,
+        .groups = groups,
+        .groupCount = 1,
+    };
+
+    return group;
 }
