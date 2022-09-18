@@ -14,7 +14,12 @@ typedef struct{
     char state;
 }Object;
 
-void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long bg);
-Object* getObjects();
+typedef struct{
+    Object* objects;
+    int count;
+}ObjectGroup;
+
+void drawObjects(ObjectGroup objects, Display *dpy, Drawable drawable, GC gc, long bg);
+ObjectGroup getObjects();
 void getSpritesToRender();
-void freeObjects(Object* objects);
+void freeObjects(ObjectGroup objects);

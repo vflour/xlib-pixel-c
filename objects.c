@@ -17,10 +17,9 @@ void getSpritesToRender(){
     return sprites;
 }
 
-Object* getObjects(){
+ObjectGroup getObjects(){
     int numObjects = 2;
     Object* objects = malloc(numObjects*sizeof(Object));
-
 
     Object o1 = {
         .sprite = &sprites[0],
@@ -54,7 +53,11 @@ Object* getObjects(){
     };
     objects[1] = o2;
 
-    return objects;
+    ObjectGroup group = {
+        .objects = objects,
+        .count = numObjects
+    };
+    return group;
 }
 
 void stepVelocity(Object* o){
@@ -76,9 +79,10 @@ int positive_modulo(int i, int n) {
     return (i % n + n) % n;
 }
 
-void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long bg){
+void drawObjects(ObjectGroup objectGroup, Display *dpy, Drawable drawable, GC gc, long bg){
+    Object* objects = objectGroup.objects;
     usleep(50000);
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < objectGroup.count; i++){
         SpriteGroup* spriteGroup = objects[i].sprite;
         char prevStep = positive_modulo(objects[i].step - 1, spriteGroup->groups[objects[i].state]);
         char index = getSpriteIndex(spriteGroup, prevStep, objects[i].state);
@@ -88,7 +92,7 @@ void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long b
         stepVelocity(&objects[i]);
     }
     usleep(1000);
-    for(int i=0; i<2; i++){
+    for(int i=0; i<objectGroup.count; i++){
         SpriteGroup* spriteGroup = objects[i].sprite;
         PixelSprite* sprite = &spriteGroup->sprites[getSpriteIndex(spriteGroup, objects[i].step, objects[i].state)];
 
@@ -99,8 +103,10 @@ void drawObjects(Object* objects, Display *dpy, Drawable drawable, GC gc, long b
     XFlush(dpy);
 }
 
-void freeObjects(Object* objects){
+void freeObjects(ObjectGroup objects){
+    free(objects.objects);
+    
+    free(sprites[0].sprites);
     free(sprites);
-    free(objects);
     printf("Freed up object memory \n");
 }

@@ -1,0 +1,37 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "grass.tsx": {
+            "dynamicWrapping": false
+        },
+        "map.tsx": {
+            "dynamicWrapping": true
+        },
+        "test.tsx": {
+            "dynamicWrapping": false
+        }
+    },
+    "last.imagePath": "/home/vflour/Projects/PixelFighterC/sprites/sprout_lands/Tilesets",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+    ],
+    "project": "map.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.type": 0
+}
