@@ -3,14 +3,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+
+#include "sprite.h"
+#include "cute_tiled.h"
 #include "cute_aseprite.h"
 #include "png.h"
 
 #define PNG_DEBUG 3
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xos.h>
-#include "sprite.h"
 
 /// @brief Converts RGB values into an unsigned long val
 /// @param r
@@ -36,12 +38,12 @@ void abort_(const char * s, ...)
 /// @param dpy 
 /// @param drawable 
 /// @param gc 
-void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc){
+void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background){
     for (unsigned short i = 0; i < MAX_SPRITE_SIZE; i++){
         short x = i%sprite->columns+offsetX;
         short y = i/sprite->columns+offsetY;
 
-        if(sprite->pixels[i]!=0){
+        if(sprite->pixels[i]!=background){
             XSetForeground(dpy, gc, sprite->pixels[i]);
             XDrawPoint(dpy, drawable, gc, x, y);
         }
@@ -139,6 +141,7 @@ png_bytep* readPng(char* file_name, int *width, int * height){
 PixelSprite processFile(png_bytep * row_pointers, int width, int height){
     PixelSprite sprite;
     sprite.columns = width;
+    sprite.rows = height;
 
     /// Go through each row
     for (int y=0; y< height; y++) {
@@ -175,7 +178,6 @@ SpriteGroup readSpriteGroup(char * path){
         for(int x = 0; x<l; ++x){
             ase_color_t  color = frame->pixels[x];
             long pix = RGB(color.r, color.g, color.b);
-            //printf("%d \n", pix);
             
             sprites[i].pixels[x] = pix;
         }

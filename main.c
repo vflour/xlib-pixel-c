@@ -19,7 +19,7 @@ XEvent event;
 GC gc;
 long black;
 long white;
-Object* objects;
+ObjectGroup objects;
 
 void initWindow();
 void closeWindow();
@@ -32,14 +32,14 @@ void initWindow(){
     black = BlackPixel(dpy, screen);	/* get color black */
     white = WhitePixel(dpy, screen);  /* get color white */
 
-    win = XCreateSimpleWindow(dpy, RootWindow(dpy, screen), 0, 0, 500, 500, 1, black, white);
+    win = XCreateSimpleWindow(dpy, RootWindow(dpy, screen), 0, 0, 500, 500, 1, white, black);
     XSetStandardProperties(dpy, win, "PixelController", "", None, NULL, 0, NULL);
     XSelectInput(dpy, win, ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);
     gc = XCreateGC(dpy, win, 0, 0);
-    XSetBackground(dpy, gc, white);
-    XSetForeground(dpy, gc, black);
+    XSetBackground(dpy, gc, black);
+    XSetForeground(dpy, gc, white);
 
-    childWin = XCreateSimpleWindow(dpy, win, 20, 20, 200, 100, 1, black, white);
+    childWin = XCreateSimpleWindow(dpy, win, 20, 20, 200, 100, 1, white, black);
 
     XClearWindow(dpy, win);
     XMapRaised(dpy, win);
@@ -57,12 +57,12 @@ void closeWindow(){
 }
 
 void physicsLoop(){
-    drawObjects(objects, dpy, win, gc, white);
+    drawObjects(objects, dpy, win, gc, black);
 }
 
 void drawWindow(){
     //XClearWindow(dpy, win);
-    drawObjects(objects, dpy, win, gc, white);
+    drawObjects(objects, dpy, win, gc, black);
     
 }
 
@@ -74,7 +74,7 @@ void eventLoop(){
     while(1){
         XCheckWindowEvent(dpy, win, ExposureMask | KeyReleaseMask | KeyPressMask , &event);
         //XNextEvent(dpy, &event);
-        drawWindow();
+        
         if(event.type == KeyPress){
             if( XLookupString(&event.xkey, text, 255, &key, 0)==1){
                 if(text[0] == 'q') {
@@ -82,32 +82,35 @@ void eventLoop(){
                 }
             }
             if(event.xkey.keycode == 113){
-                objects[0].velocity.x = -5;
+                objects.objects[0].velocity.x = -5;
             }
             if(event.xkey.keycode == 114){
-                objects[0].velocity.x = 5;
+                objects.objects[0].velocity.x = 5;
             }
             if(event.xkey.keycode == 116){
-                objects[0].velocity.y = 5;
+                objects.objects[0].velocity.y = 5;
             }
             if(event.xkey.keycode == 111){
-                objects[0].velocity.y = -5;
+                objects.objects[0].velocity.y = -5;
             }
         }
         else if(event.type == KeyRelease){
             if(event.xkey.keycode == 113){
-                objects[0].velocity.x = 0;
+                objects.objects[0].velocity.x = 0;
             }
             if(event.xkey.keycode == 114){
-                objects[0].velocity.x = 0;
+                objects.objects[0].velocity.x = 0;
             }
             if(event.xkey.keycode == 116){
-                objects[0].velocity.y = 0;
+                objects.objects[0].velocity.y = 0;
             }
             if(event.xkey.keycode == 111){
-                objects[0].velocity.y = 0;
-            }            
+                objects.objects[0].velocity.y = 0;
+            }
         }
+        else if(event.type== Expose){
+            drawWindow(); 
+        }            
     }
 }
 
