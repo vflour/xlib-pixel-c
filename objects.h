@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "sprite.h"
+#include <X11/Xlib.h>
 
 typedef struct{
     SpriteGroup* sprite;
@@ -19,7 +20,6 @@ typedef struct{
 }ObjectGroup;
 
 void drawObjects(ObjectGroup objects, Display *dpy, Drawable drawable, GC gc, long bg);
-ObjectGroup getObjects();
-ObjectGroup getMap(char * path);
+ObjectGroup getObjects(Display* dpy, Visual* vis, int depth);
 void getSpritesToRender();
 void freeObjects(ObjectGroup objects);

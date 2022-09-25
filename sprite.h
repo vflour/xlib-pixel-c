@@ -18,7 +18,7 @@ typedef struct {
 
 /// @brief Group the sprites into animatable ones
 typedef struct {
-    PixelSprite* sprites;
+    XImage** sprites;
     /// Store each anim group sequentially, based on the length of each one
     char* groups;
     char groupCount;
@@ -26,6 +26,7 @@ typedef struct {
 
 typedef struct{
     SpriteGroup* sprites;
+    int count;
 }SpritePack;
 
 PixelSprite readSprite(char* path);
@@ -34,5 +35,6 @@ SpriteGroup readSpriteGroup(char * path);
 void clearSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background);
 void drawSprite(PixelSprite *sprite, short offsetX, short offsetY, Display *dpy, Drawable drawable, GC gc, long background);
 unsigned long RGB(int r, int g, int b);
+void getXImageFromSprite(XImage* image, PixelSprite sprite);
 
 #endif

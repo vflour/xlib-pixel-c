@@ -198,3 +198,13 @@ SpriteGroup readSpriteGroup(char * path){
 
     return group;
 }
+
+void getXImageFromSprite(XImage* image, PixelSprite sprite){
+    XInitImage(image);
+    image->width = sprite.columns;
+    image->height = sprite.rows;
+    int count = sprite.columns*sprite.rows;
+    for(int i = 0; i<count; i++){
+        XPutPixel(image, i%sprite.columns, i/sprite.columns, sprite.pixels[i]);
+    }
+}

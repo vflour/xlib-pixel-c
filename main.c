@@ -12,6 +12,8 @@
 #include <pthread.h>
 
 Display *dpy;
+Visual* visual;
+int depth;
 int screen;
 Window win;
 Window childWin;
@@ -38,6 +40,12 @@ void initWindow(){
     gc = XCreateGC(dpy, win, 0, 0);
     XSetBackground(dpy, gc, black);
     XSetForeground(dpy, gc, white);
+
+    XWindowAttributes attr;
+    XGetWindowAttributes(dpy, win, &attr);
+
+    visual = attr.visual;
+    depth = DefaultDepth(dpy, screen);
 
     childWin = XCreateSimpleWindow(dpy, win, 20, 20, 200, 100, 1, white, black);
 
@@ -115,8 +123,8 @@ void eventLoop(){
 }
 
 void threadLoop(){
-    getSpritesToRender();
-    objects = getObjects();
+    //getSpritesToRender();
+    objects = getObjects(dpy, visual, depth);
     eventLoop();
 }
 
